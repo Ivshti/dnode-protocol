@@ -83,7 +83,7 @@ Proto.prototype.handle = function (req) {
     }
     else if (typeof req.method === 'string') {
         if (isEnumerable(self.instance, req.method)) {
-            self.apply(self.instance[req.method], args);
+            self.apply(self.instance, self.instance[req.method], args);
         }
         else {
             self.emit('fail', new Error(
@@ -96,7 +96,7 @@ Proto.prototype.handle = function (req) {
         if (!fn) {
             self.emit('fail', new Error('no such method'));
         }
-        else self.apply(fn, args);
+        else self.apply(fn[1], fn[0], args);
     }
 };
 
@@ -119,7 +119,7 @@ Proto.prototype.handleMethods = function (methods) {
     self.emit('ready');
 };
 
-Proto.prototype.apply = function (f, args) {
-    try { f.apply(undefined, args) }
+Proto.prototype.apply = function (ctx, f, args) {
+    try { f.apply(ctx, args) }
     catch (err) { this.emit('error', err) }
 };
